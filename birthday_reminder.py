@@ -1,6 +1,7 @@
 from tkinter import *
 import sqlite3
 import datetime
+import tkinter.messagebox as tmsg
 
 class mainpage:
 	def __init__(self,rt):
@@ -13,8 +14,12 @@ class mainpage:
 		global l1
 		du=Frame(frame,bg="red")
 		du.place(relx=0.12,rely=0.27,relheight=0.5,relwidth=0.76)
-		l1=Label(du,bg="black",fg="white",font=("Arial",13,"normal"),justify="left",anchor="nw")
+		l1=Listbox(du,bg="black",fg="white",font=("Arial",13,"normal"))
 		l1.place(relx=0.02,rely=0.15,relheight=0.83,relwidth=0.96)
+		scrollbar = Scrollbar(l1,bg = "black", activebackground ="black", bd = 10, cursor = "dot",elementborderwidth = 2, highlightbackground = "black",troughcolor = "green")
+		scrollbar.pack(side =RIGHT, fill =Y)
+		l1.config(yscrollcommand = scrollbar.set)
+		scrollbar.config(command = l1.yview)
 		Label(du,bg="red",text="Recent/Upcomming Birthdays :",fg="yellow",font=("Arial",14,"normal"),justify="left",anchor="nw").place(relx=0.01,rely=0,relheight=0.15,relwidth=0.98)
 		button=Button(frame,bg="violet",fg="red",bd=5,text="Add new birthday",font=18,command=lambda: self.add_page(rt))
 		button.place(relx=0.1,rely=0.8)
@@ -85,31 +90,32 @@ class mainpage:
 			try:
 				curser.execute("INSERT INTO Members(Name,Day,Month,Year) VALUES(?,?,?,?)",(n,int(d),int(m),int(y)))
 				self.clear()
-				Label(fr1,bg="yellow",text="Birthday successfully added !",fg="red",font=8).place(relx=0.2,rely=0.7)
+				tmsg.showinfo("Success !","The birthday was added to the database successfully.")
 			except:
-				Label(fr1,bg="yellow",text="Failed to add birthday !",fg="red",font=8).place(relx=0.2,rely=0.7)	
+				tmsg.showinfo("Failed !","Please enter all the fields correctly.")
 			ct.commit()
 	def view(self):
-		lb["text"]=''
-		mon=("January","February","March","April","May","June","July","August","September","October","November","December")
 		v_n=v_b.get()
-		e6.delete(0,END)
-		conn=sqlite3.connect("birthdays.db")
-		txt=''
-		with conn:
-			c=conn.cursor()
-			c.execute("SELECT * FROM Members WHERE Name=?",(v_n,))
-			for r in c.fetchall():
-				n=r[0]
-				dd=r[1]
-				mm=r[2]
-				yyyy=r[3]
-				txt=n+"'s"+" birthday is on \n"+str(dd)+" "+mon[mm-1]+" "+str(yyyy)
+		if v_n != "":
+			lb["text"]=''
+			mon=("January","February","March","April","May","June","July","August","September","October","November","December")
+			e6.delete(0,END)
+			conn=sqlite3.connect("birthdays.db")
+			txt=''
+			with conn:
+				c=conn.cursor()
+				c.execute("SELECT * FROM Members WHERE Name=?",(v_n,))
+				for r in c.fetchall():
+					n=r[0]
+					dd=r[1]
+					mm=r[2]
+					yyyy=r[3]
+					txt=n+"'s"+" birthday is on \n"+str(dd)+" "+mon[mm-1]+" "+str(yyyy)
 
-		conn.commit()
-		if txt=="":
-			txt="Data Not Available!"
-		lb['text']=txt	
+			conn.commit()
+			if txt=="":
+				tmsg.showinfo("Not Found!","The person whose birthday you want view is not present in the database")
+			lb['text']=txt	
 	def upcomming_bdays(self):
 		mon=("January","February","March","April","May","June","July","August","September","October","November","December")
 		tday=datetime.date.today()
@@ -118,33 +124,38 @@ class mainpage:
 		today_month=int(tday.month)
 		top_show=''
 		conn=sqlite3.connect("birthdays.db")
+		index=1
 		with conn:
 			c=conn.cursor()
 			for j in range(today_month,13):
 				for i in range(today_day,32):
 					c.execute("SELECT * FROM Members WHERE Day=? and Month=?",(i,j,))
 					for r in c.fetchall():
-						top_show=top_show+"-> "+r[0]+" has birthday on "+str(r[1])+" "+mon[r[2]-1]+"."+"\n"	
+						top_show="-> "+r[0]+" has birthday on "+str(r[1])+" "+mon[r[2]-1]+"."
+						l1.insert(index,top_show)
+						index+=1
 				today_day=1	
 
 			for j in range(1,today_month+1):
 				for i in range(1,temp):
 					c.execute("SELECT * FROM Members WHERE Day=? and Month=?",(i,j,))
 					for r in c.fetchall():
-						top_show=top_show+"-> "+r[0]+" has birthday on "+str(r[1])+" "+mon[r[2]-1]+"."+"\n"											
+						top_show="-> "+r[0]+" has birthday on "+str(r[1])+" "+mon[r[2]-1]+"."
+						l1.insert(index, top_show)
+						index+=1										
 					if j==today_month-1:
 						temp=datetime.date.today().day			
 			conn.commit()	
-			l1["text"]=top_show	
 	def delete_data(self):
 		deleted_name=d_n.get()
-		conn=sqlite3.connect("birthdays.db")
-		with conn:
-			c=conn.cursor()
-			c.execute("DELETE FROM Members WHERE Name=?",(deleted_name,))
-			conn.commit()
-		e1.delete(0,END)
-		Label(fr3,bg="blue",fg="pink",font=("Arial",20,"normal"),text="Profile Deleted !").place(relx=0.2,rely=0.5)
+		if deleted_name != "":
+			conn=sqlite3.connect("birthdays.db")
+			with conn:
+				c=conn.cursor()
+				c.execute("DELETE FROM Members WHERE Name=?",(deleted_name,))
+				conn.commit()
+			e1.delete(0,END)
+			tmsg.showinfo("Message","Profile Deleted")
 
 
 
@@ -169,8 +180,10 @@ class mainpage:
 		back.place(relx=0.8,rely=0.8)
 		view=Button(fr2,bd=7,bg="blue",fg="yellow",text="View",font=("Arial",14,"normal"),command=lambda: self.view())
 		view.place(relx=0.1,rely=0.8)	
-		lb=Label(fr2,bg="red",fg="white",font=("Comic Sans MS",20,"bold"),justify="left")
-		lb.place(relx=0.1,rely=0.5)					
+		lb=Label(fr2,bg="red",fg="white",font=("Comic Sans MS",15,"bold"),justify="left")
+		lb.place(relx=0.1,rely=0.5)
+					
 root=Tk()
 b=mainpage(root)
+
 root.mainloop()
