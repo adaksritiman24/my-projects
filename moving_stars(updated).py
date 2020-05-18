@@ -4,7 +4,7 @@ import random
 scr =tl.Screen()
 scr.title("Moving Stars")
 scr.tracer(0)
-scr.setup(800,800)
+scr.setup(1200,800)
 scr.bgcolor("black")
 
 class Star:
@@ -16,6 +16,7 @@ class Star:
 		self.star.shapesize(self.size)
 		self.star.color("white")
 		self.star.penup()
+		self.movforce= random.choice([0.6,0.8,0.3,0.5,1.0,2,5])
 		self.initialize(m, n)
 	def initialize(self,m,n):	
 		self.size = 0.1
@@ -27,7 +28,7 @@ class Star:
 		if self.a>2 or self.a<-2:
 			self.p = self.b/self.a
 		else:
-			self.p=0.5	
+			self.p=0.7
 		#print(self.a/self.b)
 	def move(self):
 		if self.x<0:
@@ -38,13 +39,13 @@ class Star:
 
 		self.star.setx(self.x)
 		self.star.sety(self.y)
-		self.star.shapesize(self.size)
-		self.size+=0.007
-		self.z+=0.5
+		self.star.shapesize(self.size*self.movforce)
+		self.size+=0.03
+		self.z+= self.movforce
 		
 stars =[]
-for i in range(40):
-	star = Star(random.randint(-400,400), random.randint(-400,400))
+for i in range(100):
+	star = Star(random.randint(-700,700), random.randint(-700,700))
 	stars.append(star)
 
 run =True
@@ -52,8 +53,8 @@ while run:
 	scr.update()
 	for star in stars:
 		star.move()
-		if star.star.xcor()>500 or star.star.ycor()>500 or star.star.ycor()<-500 or star.star.xcor()<-500:
-			star.star.shapesize(0.05)
-			star.initialize(random.randint(-100,100),random.randint(-100,100))
+		if star.star.xcor()>1000 or star.star.ycor()>500 or star.star.ycor()<-500 or star.star.xcor()<-1000:
+			star.star.shapesize(random.choice([0.1,0.2,0.05,0.03]))
+			star.initialize(random.randint(-200,200),random.randint(-200,200))
 			
 scr.mainloop()		
