@@ -21,7 +21,8 @@ class Turtle():
 		self.turtle.goto(pos)
 		self.turtle.pendown()
 		self.finished =False
-	def run(self):
+	def run(self, sp):
+		self.speed= 8/sp
 		if not self.finished:
 			self.turtle.forward(self.speed)	
 	def check_completed(self):
@@ -67,12 +68,20 @@ draw_start()
 draw_finish()			
 # defining the 5 turtle objects that would race against each other
 # store all turtles in a list named ,turtles
-turtle_1 = Turtle((0,-200),"white",random.randint(10,20))
-turtle_2 = Turtle((50,-200),"blue",random.randint(10,20))
-turtle_3 = Turtle((-50,-200),"red",random.randint(10,20))
-turtle_4 = Turtle((100,-200),"black",random.randint(10,20))
-turtle_5 = Turtle((-100,-200),"yellow",random.randint(10,20))
+turtle_1 = Turtle((0,-200),"white",random.randint(7,15))
+turtle_2 = Turtle((50,-200),"blue",random.randint(7,15))
+turtle_3 = Turtle((-50,-200),"red",random.randint(7,15))
+turtle_4 = Turtle((100,-200),"black",random.randint(7,15))
+turtle_5 = Turtle((-100,-200),"yellow",random.randint(7,15))
 turtles = [turtle_1,turtle_5,turtle_4,turtle_3,turtle_2]
+
+def winner_current(winners):
+	score = tl.Turtle()
+	score.hideturtle()
+	score.color("white")
+	score.penup()
+	score.goto(-280,300)
+	score.write(f"Winner(s): {winners}",False,font={"lucida",70,"bold"})
 
 run =True
 new =True
@@ -83,7 +92,7 @@ while run:
 	#  moving each and every turtle on the screen
 	#  if the particular turtle has finished the race, it wii stop moving	 
 	for turtle in turtles:	
-		turtle.run()
+		turtle.run(random.randint(1,25))
 		turtle.check_completed()
 	done = 0
 	winners.clear()
@@ -100,10 +109,11 @@ while run:
 			f.write("WINNERS(s):\n")
 			win = ""
 			for winner in winners:
-				win = win+winner+" "
+				win = win+winner+" "			
 			f.write(win)
 			f.write("\n\n")
 			f.close()	
+			winner_current(win)
 			winners.clear()
 			#once the winner is saved--ensure that further no more turtles are saved in the turtle_winner file
 			new = False		
@@ -120,11 +130,11 @@ while run:
 		scr.bgcolor("green")
 		draw_start()
 		draw_finish()
-		turtle_1 = Turtle((0,-200),"white",random.randint(5,15))
-		turtle_2 = Turtle((50,-200),"blue",random.randint(5,15))
-		turtle_3 = Turtle((-50,-200),"red",random.randint(5,15))
-		turtle_4 = Turtle((100,-200),"black",random.randint(5,15))
-		turtle_5 = Turtle((-100,-200),"yellow",random.randint(5,15))
+		turtle_1 = Turtle((0,-200),"white",random.randint(7,12))
+		turtle_2 = Turtle((50,-200),"blue",random.randint(7,12))
+		turtle_3 = Turtle((-50,-200),"red",random.randint(7,12))
+		turtle_4 = Turtle((100,-200),"black",random.randint(7,12))
+		turtle_5 = Turtle((-100,-200),"yellow",random.randint(7,12))
 		turtles = [turtle_1,turtle_5,turtle_4,turtle_3,turtle_2]
 		#turtles are ready for a new race
 				
